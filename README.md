@@ -5,4 +5,4 @@ Copy from [Material-ui treeview example](https://material-ui.com/components/tree
 - add a toolbar with search input and setting menu button
 
 
-![screenshot](./public/screenshot.png)
+![screenshot](./public/screenshot.png){ width=50% }
