@@ -9,6 +9,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
 import IconButton from "@material-ui/core/IconButton";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
+import CloseIcon from "@material-ui/icons/Close";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 
@@ -41,22 +42,31 @@ function CloseSquare(props) {
   );
 }
 
-const SearchInput = ({ classes, onChange }) => (
-  <div className={classes.root}>
-    <div className={classes.searchIcon}>
-      <SearchIcon />
+const SearchInput = ({ classes, value, onChange, onClose }) => {
+  return (
+    <div className={classes.root}>
+      <div className={classes.searchIcon}>
+        <SearchIcon />
+      </div>
+      <InputBase
+        placeholder="Search…"
+        classes={{
+          root: classes.inputRoot,
+          input: classes.inputInput
+        }}
+        inputProps={{ "aria-label": "search" }}
+        value={value || ""}
+        onChange={onChange}
+      />
+      {value && value !== "" && (
+        <IconButton className={classes.closeIcon} onClick={onClose}>
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      )}
     </div>
-    <InputBase
-      placeholder="Search…"
-      classes={{
-        root: classes.inputRoot,
-        input: classes.inputInput
-      }}
-      inputProps={{ "aria-label": "search" }}
-      onChange={onChange}
-    />
-  </div>
-);
+  );
+};
+
 const StyledSearchInput = withStyles(theme => ({
   root: {
     flex: 1,
@@ -74,6 +84,18 @@ const StyledSearchInput = withStyles(theme => ({
     alignItems: "center",
     justifyContent: "center"
   },
+  closeIcon: {
+    width: theme.spacing(5),
+    height: "100%",
+    position: "absolute",
+    right: 0,
+    bottom: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
+    color: "inherit"
+  },
   inputRoot: {
     color: "inherit",
     width: "100%"
@@ -90,6 +112,7 @@ const StyledSearchInput = withStyles(theme => ({
 
 const Toolbar = ({ classes, onChange }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [keyword, setKeyWord] = React.useState("");
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -98,9 +121,20 @@ const Toolbar = ({ classes, onChange }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   return (
     <div className={classes.root}>
-      <StyledSearchInput onChange={onChange} />
+      <StyledSearchInput
+        value={keyword}
+        onChange={e => {
+          setKeyWord(e.target.value);
+          onChange(e.target.value);
+        }}
+        onClose={() => {
+          setKeyWord("");
+          onChange("");
+        }}
+      />
       <IconButton
         aria-label="delete"
         className={classes.button}
@@ -238,9 +272,9 @@ const SearchableTreeView = ({ children, ...others }) => {
   const [keyword, setKeyWord] = React.useState(null);
 
   const handleSearch = React.useCallback(
-    e => {
-      if (e.target.value && e.target.value.trim() !== "") {
-        setKeyWord(e.target.value.trim());
+    value => {
+      if (value && value.trim() !== "") {
+        setKeyWord(value.trim());
       } else {
         setKeyWord(null);
       }
