@@ -162,8 +162,11 @@ const StyledToolbar = withStyles(theme => ({
 const StyledTreeItem = withStyles(theme => ({
   root: {
     "&:focus > $content:before": {
-      backgroundColor: theme.palette.grey[400],
-      display: "inherit"
+      backgroundColor: fade(theme.palette.primary.main, 0.2),
+      display: "inherit",
+    },
+    "&:focus > $content": {
+      backgroundColor: "transparent",
     }
   },
   iconContainer: {
@@ -187,7 +190,7 @@ const StyledTreeItem = withStyles(theme => ({
     "&::before": {
       display: "none",
       content: "''",
-      backgroundColor: theme.palette.action.hover,
+      backgroundColor: fade(theme.palette.primary.main, 0.1),
       color: "white",
       height: "100%",
       width: "200%",
