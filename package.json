@@ -5,12 +5,13 @@
   },
   "description": "https://github.com/mui-org/material-ui/blob/master/docs/src/pages/components/tree-view/CustomizedTreeView.js",
   "dependencies": {
-    "react-spring": "latest",
-    "react-dom": "latest",
-    "react": "latest",
-    "prop-types": "latest",
+    "@material-ui/core": "latest",
+    "@material-ui/icons": "4.5.1",
     "@material-ui/lab": "latest",
-    "@material-ui/core": "latest"
+    "prop-types": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-spring": "latest"
   },
   "name": "material-demo",
   "version": "0.0.0",

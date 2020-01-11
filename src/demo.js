@@ -6,6 +6,13 @@ import TreeView from "@material-ui/lab/TreeView";
 import TreeItem from "@material-ui/lab/TreeItem";
 import Collapse from "@material-ui/core/Collapse";
 import { useSpring, animated } from "react-spring/web.cjs"; // web.cjs is required for IE 11 support
+import transitions from "@material-ui/core/styles/transitions";
+import SearchIcon from "@material-ui/icons/Search";
+import InputBase from "@material-ui/core/InputBase";
+import IconButton from "@material-ui/core/IconButton";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 
 function MinusSquare(props) {
   return (
@@ -57,6 +64,111 @@ TransitionComponent.propTypes = {
   in: PropTypes.bool
 };
 
+const SearchInput = ({ classes }) => (
+  <div className={classes.root}>
+    <div className={classes.searchIcon}>
+      <SearchIcon />
+    </div>
+    <InputBase
+      placeholder="Search…"
+      classes={{
+        root: classes.inputRoot,
+        input: classes.inputInput
+      }}
+      inputProps={{ "aria-label": "search" }}
+    />
+  </div>
+);
+const StyledSearchInput = withStyles(theme => ({
+  root: {
+    flex: 1,
+    position: "relative",
+    borderRadius: theme.shape.borderRadius,
+
+    // marginLeft: theme.spacing(1),
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
+      marginLeft: theme.spacing(3),
+      width: "auto"
+    }
+  },
+  searchIcon: {
+    width: theme.spacing(5),
+    height: "100%",
+    position: "absolute",
+    pointerEvents: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  inputRoot: {
+    color: "inherit",
+    width: "100%"
+  },
+  inputInput: {
+    padding: theme.spacing(1.5, 1, 1.5, 5),
+    transition: theme.transitions.create("width"),
+    width: "100%",
+    // backgroundColor: fade(theme.palette.common.white, 0.15),
+    "&:hover": {
+      backgroundColor: fade(theme.palette.common.white, 0.1)
+    },
+    [theme.breakpoints.up("md")]: {
+      width: 200
+    }
+  }
+}))(props => <SearchInput {...props} />);
+
+const Toolbar = ({ classes }) => {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = event => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  return (
+    <div className={classes.root}>
+      <StyledSearchInput />
+      <IconButton
+        aria-label="delete"
+        className={classes.button}
+        size="small"
+        onClick={handleClick}
+      >
+        <MoreVertIcon fontSize="small" />
+      </IconButton>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem onClick={handleClose}>Create Item</MenuItem>
+        <MenuItem onClick={handleClose}>Edit Item</MenuItem>
+        <MenuItem onClick={handleClose}>Delete Item</MenuItem>
+      </Menu>
+    </div>
+  );
+};
+const StyledToolbar = withStyles(theme => ({
+  root: {
+    backgroundColor: theme.palette.primary.main,
+    // padding: theme.spacing(0.5, 0),
+    color: theme.palette.primary.contrastText,
+
+    display: "flex",
+    justifyContent: "space-between"
+  },
+  button: {
+    color: "inherit",
+    marginRight: theme.spacing(1)
+  }
+}))(props => <Toolbar {...props} />);
+
 const StyledTreeItem = withStyles(theme => ({
   root: {
     "&:focus > $content:before": {
@@ -76,7 +188,8 @@ const StyledTreeItem = withStyles(theme => ({
     borderLeft: `1px dashed ${fade(theme.palette.text.primary, 0.4)}`
   },
   label: {
-    lineHeight: "2em"
+    lineHeight: "2em",
+    whiteSpace: "nowrap"
   },
   content: {
     position: "relative",
@@ -102,23 +215,33 @@ const StyledTreeItem = withStyles(theme => ({
   }
 }))(props => <TreeItem {...props} TransitionComponent={TransitionComponent} />);
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   root: {
+    display: "flex",
+    flexDirection: "column",
+    "& > * ": {
+      marginBottom: theme.spacing(1)
+    },
+    margin: "100px"
+  },
+  tree: {
+    paddingLeft: theme.spacing(1),
     height: 300,
     flexGrow: 1,
     maxWidth: 400,
     // overflow: "auto"
     overflowX: "hidden"
   }
-});
+}));
 
 export default function CustomizedTreeView() {
   const classes = useStyles();
 
   return (
-    <div style={{ marginLeft: "100px" }}>
+    <div className={classes.root}>
+      <StyledToolbar />
       <TreeView
-        className={classes.root}
+        className={classes.tree}
         defaultExpanded={["1"]}
         defaultCollapseIcon={<MinusSquare />}
         defaultExpandIcon={<PlusSquare />}
