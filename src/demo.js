@@ -6,7 +6,6 @@ import TreeView from "@material-ui/lab/TreeView";
 import TreeItem from "@material-ui/lab/TreeItem";
 import Collapse from "@material-ui/core/Collapse";
 import { useSpring, animated } from "react-spring/web.cjs"; // web.cjs is required for IE 11 support
-import transitions from "@material-ui/core/styles/transitions";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
 import IconButton from "@material-ui/core/IconButton";
@@ -85,7 +84,6 @@ const StyledSearchInput = withStyles(theme => ({
     position: "relative",
     borderRadius: theme.shape.borderRadius,
 
-    // marginLeft: theme.spacing(1),
     width: "100%",
     [theme.breakpoints.up("sm")]: {
       marginLeft: theme.spacing(3),
@@ -109,7 +107,6 @@ const StyledSearchInput = withStyles(theme => ({
     padding: theme.spacing(1.5, 1, 1.5, 5),
     transition: theme.transitions.create("width"),
     width: "100%",
-    // backgroundColor: fade(theme.palette.common.white, 0.15),
     "&:hover": {
       backgroundColor: fade(theme.palette.common.white, 0.1)
     },
@@ -157,7 +154,6 @@ const Toolbar = ({ classes }) => {
 const StyledToolbar = withStyles(theme => ({
   root: {
     backgroundColor: theme.palette.primary.main,
-    // padding: theme.spacing(0.5, 0),
     color: theme.palette.primary.contrastText,
 
     display: "flex",
@@ -204,10 +200,9 @@ const StyledTreeItem = withStyles(theme => ({
       marginLeft: "-100%",
       position: "absolute",
       zIndex: -1
-      // border: "1px solid black"
     },
     "&:hover": {
-      backgroundColor: "rgba(0, 0, 0, .0)"
+      backgroundColor: "transparent"
     },
     "&:hover::before": {
       display: "inherit"
@@ -226,10 +221,9 @@ const useStyles = makeStyles(theme => ({
   },
   tree: {
     paddingLeft: theme.spacing(1),
-    height: 300,
+    height: 700,
     flexGrow: 1,
     maxWidth: 400,
-    // overflow: "auto"
     overflowX: "hidden"
   }
 }));
