@@ -1,11 +1,10 @@
 import React from "react";
-import PropTypes from "prop-types";
 import SvgIcon from "@material-ui/core/SvgIcon";
 import { fade, makeStyles, withStyles } from "@material-ui/core/styles";
 import TreeView from "@material-ui/lab/TreeView";
 import TreeItem from "@material-ui/lab/TreeItem";
-import Collapse from "@material-ui/core/Collapse";
-import { useSpring, animated } from "react-spring/web.cjs"; // web.cjs is required for IE 11 support
+import TreeViewContext from "@material-ui/lab/TreeView/TreeViewContext";
+
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
 import IconButton from "@material-ui/core/IconButton";
@@ -39,29 +38,6 @@ function CloseSquare(props) {
     </SvgIcon>
   );
 }
-
-function TransitionComponent(props) {
-  const style = useSpring({
-    from: { opacity: 0, transform: "translate3d(20px,0,0)" },
-    to: {
-      opacity: props.in ? 1 : 0,
-      transform: `translate3d(${props.in ? 0 : 20}px,0,0)`
-    }
-  });
-
-  return (
-    <animated.div style={style}>
-      <Collapse {...props} />
-    </animated.div>
-  );
-}
-
-TransitionComponent.propTypes = {
-  /**
-   * Show the component; triggers the enter or exit states
-   */
-  in: PropTypes.bool
-};
 
 const SearchInput = ({ classes }) => (
   <div className={classes.root}>
@@ -159,14 +135,11 @@ const StyledToolbar = withStyles(theme => ({
   }
 }))(props => <Toolbar {...props} />);
 
-const StyledTreeItem = withStyles(theme => ({
+const useTreeItemStyles = makeStyles(theme => ({
   root: {
-    "&:focus > $content:before": {
-      backgroundColor: fade(theme.palette.primary.main, 0.2),
-      display: "inherit",
-    },
+    // reset material-ui interal style
     "&:focus > $content": {
-      backgroundColor: "transparent",
+      backgroundColor: "transparent"
     }
   },
   iconContainer: {
@@ -188,16 +161,19 @@ const StyledTreeItem = withStyles(theme => ({
     position: "relative",
 
     "&::before": {
-      display: "none",
       content: "''",
-      backgroundColor: fade(theme.palette.primary.main, 0.1),
-      color: "white",
+      display: props => (props.focused ? "inherit" : "none"),
+      backgroundColor: props =>
+        props.focused
+          ? fade(theme.palette.primary.main, 0.2)
+          : fade(theme.palette.primary.main, 0.1),
       height: "100%",
       width: "200%",
       marginLeft: "-100%",
       position: "absolute",
       zIndex: -1
     },
+    // reset material-ui interal style
     "&:hover": {
       backgroundColor: "transparent"
     },
@@ -205,7 +181,16 @@ const StyledTreeItem = withStyles(theme => ({
       display: "inherit"
     }
   }
-}))(props => <TreeItem {...props} TransitionComponent={TransitionComponent} />);
+}));
+
+const StyledTreeItem = props => {
+  const { isFocused } = React.useContext(TreeViewContext);
+  const focused = isFocused ? isFocused(props.nodeId) : false;
+  const classes = useTreeItemStyles({ focused });
+  console.log(focused);
+
+  return <TreeItem {...props} classes={classes} />;
+};
 
 const useStyles = makeStyles(theme => ({
   root: {
