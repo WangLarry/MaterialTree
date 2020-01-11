@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Children } from "react";
 import SvgIcon from "@material-ui/core/SvgIcon";
 import { fade, makeStyles, withStyles } from "@material-ui/core/styles";
 import TreeView from "@material-ui/lab/TreeView";
@@ -11,6 +11,8 @@ import IconButton from "@material-ui/core/IconButton";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+
+const SearchableTreeViewContext = React.createContext({});
 
 function MinusSquare(props) {
   return (
@@ -39,7 +41,7 @@ function CloseSquare(props) {
   );
 }
 
-const SearchInput = ({ classes }) => (
+const SearchInput = ({ classes, onChange }) => (
   <div className={classes.root}>
     <div className={classes.searchIcon}>
       <SearchIcon />
@@ -51,6 +53,7 @@ const SearchInput = ({ classes }) => (
         input: classes.inputInput
       }}
       inputProps={{ "aria-label": "search" }}
+      onChange={onChange}
     />
   </div>
 );
@@ -85,7 +88,7 @@ const StyledSearchInput = withStyles(theme => ({
   }
 }))(props => <SearchInput {...props} />);
 
-const Toolbar = ({ classes }) => {
+const Toolbar = ({ classes, onChange }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleClick = event => {
@@ -97,7 +100,7 @@ const Toolbar = ({ classes }) => {
   };
   return (
     <div className={classes.root}>
-      <StyledSearchInput />
+      <StyledSearchInput onChange={onChange} />
       <IconButton
         aria-label="delete"
         className={classes.button}
@@ -187,9 +190,28 @@ const StyledTreeItem = props => {
   const { isFocused } = React.useContext(TreeViewContext);
   const focused = isFocused ? isFocused(props.nodeId) : false;
   const classes = useTreeItemStyles({ focused });
-  console.log(focused);
 
-  return <TreeItem {...props} classes={classes} />;
+  const { keyword } = React.useContext(SearchableTreeViewContext);
+
+  const matchFunc = (p, key) => {
+    const label = p.label;
+    if (label && label.indexOf(key) !== -1) {
+      return true;
+    }
+    if (!p.children) return false;
+
+    let match = false;
+    Children.forEach(p.children, c => {
+      if (matchFunc(c.props, key)) {
+        match = true;
+      }
+    });
+    return match;
+  };
+
+  const match = keyword ? matchFunc(props, keyword) : true;
+
+  return match ? <TreeItem {...props} classes={classes} /> : null;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -211,19 +233,43 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function CustomizedTreeView() {
+const SearchableTreeView = ({ children, ...others }) => {
   const classes = useStyles();
+  const [keyword, setKeyWord] = React.useState(null);
+
+  const handleSearch = React.useCallback(
+    e => {
+      if (e.target.value && e.target.value.trim() !== "") {
+        setKeyWord(e.target.value.trim());
+      } else {
+        setKeyWord(null);
+      }
+    },
+    [setKeyWord]
+  );
 
   return (
-    <div className={classes.root}>
-      <StyledToolbar />
+    <SearchableTreeViewContext.Provider value={{ keyword }}>
+      <StyledToolbar onChange={handleSearch} />
       <TreeView
         className={classes.tree}
         defaultExpanded={["1"]}
         defaultCollapseIcon={<MinusSquare />}
         defaultExpandIcon={<PlusSquare />}
         defaultEndIcon={<CloseSquare />}
+        {...others}
       >
+        {children}
+      </TreeView>
+    </SearchableTreeViewContext.Provider>
+  );
+};
+export default function CustomizedTreeView() {
+  const classes = useStyles();
+
+  return (
+    <div className={classes.root}>
+      <SearchableTreeView>
         <StyledTreeItem nodeId="1" label="Main">
           <StyledTreeItem nodeId="2" label="Hello" />
           <StyledTreeItem nodeId="3" label="Subtree with children">
@@ -238,7 +284,7 @@ export default function CustomizedTreeView() {
           <StyledTreeItem nodeId="4" label="World" />
           <StyledTreeItem nodeId="5" label="Something something" />
         </StyledTreeItem>
-      </TreeView>
+      </SearchableTreeView>
     </div>
   );
 }
