@@ -84,11 +84,7 @@ const StyledSearchInput = withStyles(theme => ({
     position: "relative",
     borderRadius: theme.shape.borderRadius,
 
-    width: "100%",
-    [theme.breakpoints.up("sm")]: {
-      marginLeft: theme.spacing(3),
-      width: "auto"
-    }
+    width: "100%"
   },
   searchIcon: {
     width: theme.spacing(5),
@@ -109,9 +105,6 @@ const StyledSearchInput = withStyles(theme => ({
     width: "100%",
     "&:hover": {
       backgroundColor: fade(theme.palette.common.white, 0.1)
-    },
-    [theme.breakpoints.up("md")]: {
-      width: 200
     }
   }
 }))(props => <SearchInput {...props} />);
@@ -157,11 +150,12 @@ const StyledToolbar = withStyles(theme => ({
     color: theme.palette.primary.contrastText,
 
     display: "flex",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    alignItems: "center"
   },
   button: {
     color: "inherit",
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(0.5)
   }
 }))(props => <Toolbar {...props} />);
 
@@ -217,13 +211,14 @@ const useStyles = makeStyles(theme => ({
     "& > * ": {
       marginBottom: theme.spacing(1)
     },
-    margin: "100px"
+    margin: "100px",
+    maxWidth: 400,
+    height: 700
   },
   tree: {
     paddingLeft: theme.spacing(1),
-    height: 700,
     flexGrow: 1,
-    maxWidth: 400,
+
     overflowX: "hidden"
   }
 }));
